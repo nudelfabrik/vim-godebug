@@ -38,7 +38,19 @@ function! godebug#toggleBreakpoint(file, line, ...) abort
   let breakpoint = "break " . a:file. ':' . a:line
 
   " Define the sign for the gutter
-  exe "sign define gobreakpoint text=◉ texthl=Search"
+  let default_opts = {'text': '◉', 'texthl': 'Search'}
+  let opts = {}
+  if exists('g:godebug_breakpoint_sign')
+      call extend(opts, g:godebug_breakpoint_sign)
+  endif
+  call extend(opts, default_opts, 'keep')
+
+  let sign_define = 'sign define gobreakpoint '
+  for attr in keys(opts)
+        let sign_define .= ' '.attr.'='.opts[attr]
+    endfor
+
+  exe sign_define
 
   " If the line isn't already in the list, add it.
   " Otherwise remove it from the list.
